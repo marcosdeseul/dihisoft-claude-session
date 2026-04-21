@@ -32,9 +32,14 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.microsoft.playwright:playwright:1.45.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        if (!project.hasProperty("includePlaywright")) {
+            excludeTags("playwright")
+        }
+    }
 }
