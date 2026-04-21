@@ -42,3 +42,6 @@ bin/
 .env
 .env.local
 *.pem
+
+# Playwright MCP / manual-test skill artifacts
+.playwright-mcp/
