@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:board;MODE=LEGACY
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+app:
+  jwt:
+    secret: "change-me-change-me-change-me-change-me-change-me-64bytes!!"
+    expiration-ms: 3600000
+
+logging:
+  level:
+    org.springframework.security: INFO

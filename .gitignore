@@ -11,6 +11,7 @@ build/
 *.war
 *.ear
 *.nar
+!gradle/wrapper/gradle-wrapper.jar
 hs_err_pid*
 replay_pid*
 
