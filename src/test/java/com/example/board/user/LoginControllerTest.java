@@ -134,6 +134,15 @@ class LoginControllerTest {
                             .content("{\"username\":\"alice\",\"password\":\"\"}"))
                     .andExpect(status().isBadRequest());
         }
+
+        @Test
+        void username이_공백만이면_400을_반환하고_필드명을_포함한다() throws Exception {
+            mockMvc.perform(post("/api/auth/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"username\":\"   \",\"password\":\"pw12345\"}"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(containsString("username")));
+        }
     }
 
     @Nested
@@ -183,6 +192,28 @@ class LoginControllerTest {
                     .compact();
             mockMvc.perform(get("/probe/me")
                             .header("Authorization", "Bearer " + expiredToken))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void 서명은_유효하지만_sub_claim이_없는_토큰으로_호출시_401이_반환된다() throws Exception {
+            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            String noSubjectToken = Jwts.builder()
+                    .issuedAt(new Date())
+                    .expiration(new Date(System.currentTimeMillis() + 60_000))
+                    .signWith(key, Jwts.SIG.HS256)
+                    .compact();
+            mockMvc.perform(get("/probe/me")
+                            .header("Authorization", "Bearer " + noSubjectToken))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void 유효한_토큰이지만_사용자가_DB에서_삭제됐으면_401이_반환된다() throws Exception {
+            String token = jwtTokenProvider.generateToken("alice");
+            userRepository.deleteAll();
+            mockMvc.perform(get("/probe/me")
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized());
         }
 
