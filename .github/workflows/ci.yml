@@ -20,8 +20,31 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
-        run: ./gradlew build --no-daemon
+      - name: Test
+        run: ./gradlew test --no-daemon
+
+      - name: JaCoCo coverage report
+        run: ./gradlew jacocoTestReport --no-daemon
+
+      - name: Build (skip tests — already executed)
+        run: ./gradlew build -x test --no-daemon
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          flags: unittests
+          name: codecov-backend
+
+      - name: Upload coverage HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html
+          path: build/reports/jacoco/test/html
+          if-no-files-found: ignore
 
       - name: Upload test report on failure
         if: failure()
