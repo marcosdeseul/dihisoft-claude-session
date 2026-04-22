@@ -1,5 +1,6 @@
 package com.example.board.common;
 
+import com.example.board.user.AuthErrorMessages;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,6 +38,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(
             AccessDeniedException ex, HttpServletRequest request) {
         return respond(HttpStatus.FORBIDDEN, "접근이 거부되었습니다", request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(
+            AuthenticationException ex, HttpServletRequest request) {
+        return respond(HttpStatus.UNAUTHORIZED, AuthErrorMessages.INVALID_CREDENTIALS, request);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
