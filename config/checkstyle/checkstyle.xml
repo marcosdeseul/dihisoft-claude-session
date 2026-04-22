@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    Semantic-only lint rules.
+    Layout/whitespace/import order are handled by Spotless + google-java-format,
+    so those categories are intentionally omitted here to avoid conflicts.
+-->
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <module name="SuppressionFilter">
+        <property name="file" value="${suppressionFile}"/>
+        <property name="optional" value="false"/>
+    </module>
+
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <module name="LineLength">
+        <property name="max" value="140"/>
+        <property name="ignorePattern" value="^package .*|^import .*|a href|href|http://|https://|ftp://"/>
+    </module>
+
+    <module name="TreeWalker">
+        <module name="SuppressionCommentFilter"/>
+
+        <!-- Imports -->
+        <module name="AvoidStarImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="true"/>
+        </module>
+
+        <!-- Blocks / braces -->
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+            <property name="tokens"
+                      value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE,
+                             LITERAL_FOR, LITERAL_WHILE, LITERAL_DO,
+                             LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_CASE,
+                             LITERAL_DEFAULT, STATIC_INIT, INSTANCE_INIT"/>
+        </module>
+        <module name="NeedBraces"/>
+
+        <!-- Coding practices -->
+        <module name="EqualsHashCode"/>
+        <module name="EqualsAvoidNull"/>
+        <module name="MissingOverride"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="OneStatementPerLine"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="FallThrough"/>
+        <module name="DefaultComesLast"/>
+
+        <!-- Magic numbers: common literals and annotation values excluded -->
+        <module name="MagicNumber">
+            <property name="ignoreNumbers" value="-1, 0, 1, 2, 3, 100, 1000"/>
+            <property name="ignoreHashCodeMethod" value="true"/>
+            <property name="ignoreAnnotation" value="true"/>
+            <property name="ignoreFieldDeclaration" value="true"/>
+        </module>
+
+        <!-- Class design -->
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor"/>
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+
+        <!-- Misc -->
+        <module name="UpperEll"/>
+        <module name="ArrayTypeStyle"/>
+    </module>
+</module>
