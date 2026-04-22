@@ -1,9 +1,10 @@
 package com.example.board.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.MacAlgorithm;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
+
+    private static final MacAlgorithm SIGNATURE_ALGORITHM = Jwts.SIG.HS256;
 
     private final SecretKey key;
     private final long expirationMs;
@@ -30,7 +33,7 @@ public class JwtTokenProvider {
                 .subject(username)
                 .issuedAt(now)
                 .expiration(expiry)
-                .signWith(key)
+                .signWith(key, SIGNATURE_ALGORITHM)
                 .compact();
     }
 
