@@ -3,6 +3,7 @@ package com.example.board.config;
 import com.example.board.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/login")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/css/**")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/webjars/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts", "/api/posts/*").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint)

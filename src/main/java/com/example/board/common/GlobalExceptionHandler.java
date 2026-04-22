@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
@@ -30,6 +31,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotFound(
             NoHandlerFoundException ex, HttpServletRequest request) {
         return respond(HttpStatus.NOT_FOUND, "요청한 리소스를 찾을 수 없습니다", request);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatus(
+            ResponseStatusException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String message = ex.getReason() != null ? ex.getReason() : status.getReasonPhrase();
+        return respond(status, message, request);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
