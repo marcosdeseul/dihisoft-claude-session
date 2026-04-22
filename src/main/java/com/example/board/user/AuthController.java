@@ -1,8 +1,11 @@
 package com.example.board.user;
 
+import com.example.board.common.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +30,20 @@ public class AuthController {
         User user = authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SignupResponse(user.getId(), user.getUsername()));
+    }
+
+    @PostMapping("/api/auth/login")
+    @ResponseBody
+    public ResponseEntity<?> loginApi(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        try {
+            AuthService.LoginResult result = authService.login(request);
+            return ResponseEntity.ok(
+                    new LoginResponse(result.token(), result.username(), result.expiresIn()));
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED,
+                            "자격 증명이 올바르지 않습니다", httpRequest.getRequestURI()));
+        }
     }
 
     @GetMapping("/signup")
@@ -54,5 +71,8 @@ public class AuthController {
     }
 
     public record SignupResponse(Long id, String username) {
+    }
+
+    public record LoginResponse(String token, String username, long expiresIn) {
     }
 }
