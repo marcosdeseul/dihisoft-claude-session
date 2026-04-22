@@ -5,6 +5,9 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -117,6 +120,73 @@ class LoginControllerTest {
         void Bearer_토큰_없이는_보호경로가_401이다() throws Exception {
             mockMvc.perform(get("/__probe/secured"))
                     .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void 로그인_폼에서_심긴_AUTH_TOKEN_쿠키로_보호경로에_접근할_수_있다() throws Exception {
+            jakarta.servlet.http.Cookie authCookie = mockMvc.perform(post("/login")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .param("username", "alice")
+                            .param("password", "pw12345"))
+                    .andExpect(status().is3xxRedirection())
+                    .andReturn().getResponse().getCookie("AUTH_TOKEN");
+
+            mockMvc.perform(get("/__probe/secured").cookie(authCookie))
+                    .andExpect(status().is(not(401)));
+        }
+    }
+
+    @Nested
+    class View {
+
+        @Test
+        void GET_login은_로그인_폼을_렌더한다() throws Exception {
+            mockMvc.perform(get("/login"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(containsString("<form")))
+                    .andExpect(content().string(containsString("action=\"/login\"")))
+                    .andExpect(content().string(containsString("name=\"username\"")))
+                    .andExpect(content().string(containsString("name=\"password\"")))
+                    .andExpect(content().string(containsString("type=\"submit\"")));
+        }
+
+        @Test
+        void POST_login_정상입력시_success_리다이렉트와_AUTH_TOKEN_쿠키를_세팅한다() throws Exception {
+            mockMvc.perform(post("/login")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .param("username", "alice")
+                            .param("password", "pw12345"))
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(header().string("Location", "/login?success=true"))
+                    .andExpect(cookie().exists("AUTH_TOKEN"))
+                    .andExpect(cookie().httpOnly("AUTH_TOKEN", true));
+        }
+
+        @Test
+        void GET_login_success시_로그인완료_메시지를_렌더한다() throws Exception {
+            mockMvc.perform(get("/login").param("success", "true"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(containsString("로그인 완료")));
+        }
+
+        @Test
+        void POST_login_검증_실패시_동일화면에_오류_메시지가_렌더된다() throws Exception {
+            mockMvc.perform(post("/login")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .param("username", "")
+                            .param("password", "pw12345"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(containsString("username")));
+        }
+
+        @Test
+        void POST_login_자격증명_오류시_동일화면에_오류_메시지가_렌더된다() throws Exception {
+            mockMvc.perform(post("/login")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .param("username", "alice")
+                            .param("password", "wrong-password"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(containsString("자격")));
         }
     }
 }
