@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @ActiveProfiles("test")
 class JwtTokenProviderTest {
+
+    private static final String TEST_SECRET =
+            "test-secret-test-secret-test-secret-test-secret-test-secret-64!";
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
@@ -38,21 +40,13 @@ class JwtTokenProviderTest {
         assertThat(jwtTokenProvider.validate("not-a-jwt")).isFalse();
     }
 
-    @SpringBootTest
-    @ActiveProfiles("test")
-    @TestPropertySource(properties = "app.jwt.expiration-ms=1")
-    @org.springframework.test.annotation.DirtiesContext
-    static class Expiration {
+    @Test
+    void validate는_만료된_토큰을_거부한다() throws InterruptedException {
+        JwtTokenProvider shortLived = new JwtTokenProvider(TEST_SECRET, 1L);
 
-        @Autowired
-        JwtTokenProvider shortLivedProvider;
+        String token = shortLived.createToken("alice");
+        Thread.sleep(50);
 
-        @Test
-        void validate는_만료된_토큰을_거부한다() throws InterruptedException {
-            String token = shortLivedProvider.createToken("alice");
-            Thread.sleep(50);
-
-            assertThat(shortLivedProvider.validate(token)).isFalse();
-        }
+        assertThat(shortLived.validate(token)).isFalse();
     }
 }
