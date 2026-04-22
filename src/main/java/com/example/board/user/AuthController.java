@@ -1,7 +1,9 @@
 package com.example.board.user;
 
 import com.example.board.common.ErrorResponse;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class AuthController {
+
+    static final String AUTH_COOKIE_NAME = "AUTH_TOKEN";
 
     private final AuthService authService;
 
@@ -68,6 +72,36 @@ public class AuthController {
             return "signup";
         }
         return "redirect:/signup?success=true";
+    }
+
+    @GetMapping("/login")
+    public String loginForm(Model model) {
+        if (!model.containsAttribute("loginRequest")) {
+            model.addAttribute("loginRequest", new LoginRequest());
+        }
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String loginSubmit(
+            @Valid @ModelAttribute("loginRequest") LoginRequest loginRequest,
+            BindingResult bindingResult,
+            HttpServletResponse response) {
+        if (bindingResult.hasErrors()) {
+            return "login";
+        }
+        try {
+            AuthService.LoginResult result = authService.login(loginRequest);
+            Cookie cookie = new Cookie(AUTH_COOKIE_NAME, result.token());
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge((int) (result.expiresIn() / 1000));
+            response.addCookie(cookie);
+        } catch (AuthenticationException ex) {
+            bindingResult.reject("login.failed", "자격 증명이 올바르지 않습니다");
+            return "login";
+        }
+        return "redirect:/login?success=true";
     }
 
     public record SignupResponse(Long id, String username) {
