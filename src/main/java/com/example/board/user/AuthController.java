@@ -29,6 +29,12 @@ public class AuthController {
                 .body(new SignupResponse(user.getId(), user.getUsername()));
     }
 
+    @PostMapping("/api/auth/login")
+    @ResponseBody
+    public ResponseEntity<LoginResponse> loginApi(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
+    }
+
     @GetMapping("/signup")
     public String signupForm(Model model) {
         if (!model.containsAttribute("signupRequest")) {
