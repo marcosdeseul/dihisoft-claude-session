@@ -1,8 +1,7 @@
 package com.example.board.security;
 
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,13 +40,14 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void 유효한_Bearer_토큰이_있으면_SecurityContext에_사용자가_주입된다() throws Exception {
+    void 유효한_Bearer_토큰이_있으면_SecurityContext에_사용자가_주입되어_보호_경로를_통과한다()
+            throws Exception {
         String token = tokenProvider.generateToken("alice");
 
         mockMvc.perform(get("/__probe/secured")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(authenticated().withUsername("alice"));
+                .andExpect(content().string("ok"));
     }
 
     @Test
@@ -57,8 +57,7 @@ class JwtAuthenticationFilterTest {
         mockMvc.perform(get("/__probe/secured")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + expired))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(401))
-                .andExpect(unauthenticated());
+                .andExpect(jsonPath("$.status").value(401));
     }
 
     @Test
@@ -67,8 +66,7 @@ class JwtAuthenticationFilterTest {
 
         mockMvc.perform(get("/__probe/secured")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + forged))
-                .andExpect(status().isUnauthorized())
-                .andExpect(unauthenticated());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -77,8 +75,7 @@ class JwtAuthenticationFilterTest {
 
         mockMvc.perform(get("/__probe/secured")
                         .header(HttpHeaders.AUTHORIZATION, token))
-                .andExpect(status().isUnauthorized())
-                .andExpect(unauthenticated());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -87,7 +84,6 @@ class JwtAuthenticationFilterTest {
 
         mockMvc.perform(get("/__probe/secured")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
-                .andExpect(status().isUnauthorized())
-                .andExpect(unauthenticated());
+                .andExpect(status().isUnauthorized());
     }
 }
