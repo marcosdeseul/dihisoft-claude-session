@@ -1,8 +1,10 @@
 package com.example.board.user;
 
+import com.example.board.security.JwtTokenProvider;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,9 +18,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenProvider tokenProvider;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtTokenProvider tokenProvider) {
         this.authService = authService;
+        this.tokenProvider = tokenProvider;
     }
 
     @PostMapping("/api/auth/signup")
@@ -27,6 +31,19 @@ public class AuthController {
         User user = authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SignupResponse(user.getId(), user.getUsername()));
+    }
+
+    @PostMapping("/api/auth/login")
+    @ResponseBody
+    public ResponseEntity<LoginResponse> loginApi(@Valid @RequestBody LoginRequest request) {
+        String token = authService.login(request);
+        return ResponseEntity.ok(new LoginResponse(token, "Bearer", tokenProvider.getExpirationMs()));
+    }
+
+    @GetMapping("/api/me")
+    @ResponseBody
+    public ResponseEntity<MeResponse> me(Authentication authentication) {
+        return ResponseEntity.ok(new MeResponse(authentication.getName()));
     }
 
     @GetMapping("/signup")
@@ -54,5 +71,11 @@ public class AuthController {
     }
 
     public record SignupResponse(Long id, String username) {
+    }
+
+    public record LoginResponse(String accessToken, String tokenType, long expiresIn) {
+    }
+
+    public record MeResponse(String username) {
     }
 }
