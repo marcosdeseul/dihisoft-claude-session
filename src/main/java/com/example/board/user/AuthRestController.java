@@ -12,24 +12,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthRestController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    public AuthRestController(AuthService authService) {
-        this.authService = authService;
-    }
+  public AuthRestController(AuthService authService) {
+    this.authService = authService;
+  }
 
-    @PostMapping("/signup")
-    public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
-        User user = authService.signup(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new SignupResponse(user.getId(), user.getUsername()));
-    }
+  @PostMapping("/signup")
+  public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
+    User user = authService.signup(request);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(new SignupResponse(user.getId(), user.getUsername()));
+  }
 
-    @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
-    }
+  @PostMapping("/login")
+  public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+    return ResponseEntity.ok(authService.login(request));
+  }
 
-    public record SignupResponse(Long id, String username) {
-    }
+  public record SignupResponse(Long id, String username) {}
 }

@@ -14,41 +14,37 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
 
-    private final SecretKey key;
-    private final long expirationMs;
+  private final SecretKey key;
+  private final long expirationMs;
 
-    public JwtTokenProvider(
-            @Value("${app.jwt.secret}") String secret,
-            @Value("${app.jwt.expiration-ms}") long expirationMs) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationMs = expirationMs;
-    }
+  public JwtTokenProvider(
+      @Value("${app.jwt.secret}") String secret,
+      @Value("${app.jwt.expiration-ms}") long expirationMs) {
+    this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    this.expirationMs = expirationMs;
+  }
 
-    public String generateToken(String username) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + expirationMs);
-        return Jwts.builder()
-                .subject(username)
-                .issuedAt(now)
-                .expiration(expiry)
-                .signWith(key, Jwts.SIG.HS256)
-                .compact();
-    }
+  public String generateToken(String username) {
+    Date now = new Date();
+    Date expiry = new Date(now.getTime() + expirationMs);
+    return Jwts.builder()
+        .subject(username)
+        .issuedAt(now)
+        .expiration(expiry)
+        .signWith(key, Jwts.SIG.HS256)
+        .compact();
+  }
 
-    public Optional<String> resolveUsername(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-            return Optional.ofNullable(claims.getSubject());
-        } catch (JwtException | IllegalArgumentException ex) {
-            return Optional.empty();
-        }
+  public Optional<String> resolveUsername(String token) {
+    try {
+      Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+      return Optional.ofNullable(claims.getSubject());
+    } catch (JwtException | IllegalArgumentException ex) {
+      return Optional.empty();
     }
+  }
 
-    public long getExpirationMs() {
-        return expirationMs;
-    }
+  public long getExpirationMs() {
+    return expirationMs;
+  }
 }

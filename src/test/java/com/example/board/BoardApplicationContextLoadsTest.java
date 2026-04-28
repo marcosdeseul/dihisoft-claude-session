@@ -8,7 +8,6 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class BoardApplicationContextLoadsTest {
 
-    @Test
-    void 스프링_컨텍스트가_정상적으로_로드된다() {
-    }
+  @Test
+  void 스프링_컨텍스트가_정상적으로_로드된다() {}
 }

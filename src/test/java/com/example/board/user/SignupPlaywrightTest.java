@@ -17,29 +17,28 @@ import org.springframework.test.context.ActiveProfiles;
 @Tag("playwright")
 class SignupPlaywrightTest {
 
-    @LocalServerPort
-    int port;
+  @LocalServerPort int port;
 
-    @Test
-    void 브라우저로_회원가입_폼을_제출하면_성공_메시지가_표시된다() {
-        try (Playwright playwright = Playwright.create()) {
-            Browser browser = playwright.chromium()
-                    .launch(new BrowserType.LaunchOptions().setHeadless(true));
-            try {
-                Page page = browser.newPage();
-                page.navigate("http://localhost:" + port + "/signup");
+  @Test
+  void 브라우저로_회원가입_폼을_제출하면_성공_메시지가_표시된다() {
+    try (Playwright playwright = Playwright.create()) {
+      Browser browser =
+          playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+      try {
+        Page page = browser.newPage();
+        page.navigate("http://localhost:" + port + "/signup");
 
-                page.fill("#username", "playwright_user");
-                page.fill("#password", "pw12345playwright");
-                page.click("button[type=submit]");
+        page.fill("#username", "playwright_user");
+        page.fill("#password", "pw12345playwright");
+        page.click("button[type=submit]");
 
-                page.waitForURL("**/signup?success=true");
+        page.waitForURL("**/signup?success=true");
 
-                assertThat(page.url()).contains("success=true");
-                assertThat(page.content()).contains("가입 완료");
-            } finally {
-                browser.close();
-            }
-        }
+        assertThat(page.url()).contains("success=true");
+        assertThat(page.content()).contains("가입 완료");
+      } finally {
+        browser.close();
+      }
     }
+  }
 }

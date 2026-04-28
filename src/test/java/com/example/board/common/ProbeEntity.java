@@ -10,28 +10,27 @@ import jakarta.persistence.Table;
 @Table(name = "probe")
 class ProbeEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String name;
+  private String name;
 
-    protected ProbeEntity() {
-    }
+  protected ProbeEntity() {}
 
-    ProbeEntity(String name) {
-        this.name = name;
-    }
+  ProbeEntity(String name) {
+    this.name = name;
+  }
 
-    Long getId() {
-        return id;
-    }
+  Long getId() {
+    return id;
+  }
 
-    String getName() {
-        return name;
-    }
+  String getName() {
+    return name;
+  }
 
-    void setName(String name) {
-        this.name = name;
-    }
+  void setName(String name) {
+    this.name = name;
+  }
 }

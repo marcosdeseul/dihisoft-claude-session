@@ -8,6 +8,9 @@
     <suppress files="[\\/]src[\\/]test[\\/]" checks="MagicNumber"/>
     <suppress files="[\\/]src[\\/]test[\\/]" checks="HideUtilityClassConstructor"/>
 
+    <!-- Spring Boot main class: @SpringBootApplication entrypoint, not a utility class -->
+    <suppress files="BoardApplication\.java" checks="HideUtilityClassConstructor"/>
+
     <!-- Generated sources (MapStruct, Querydsl, build output) -->
     <suppress files="[\\/]build[\\/]generated[\\/]" checks=".*"/>
     <suppress files="[\\/]generated[\\/]" checks=".*"/>
