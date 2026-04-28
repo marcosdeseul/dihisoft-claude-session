@@ -1,16 +1,29 @@
 {
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@vitejs/plugin-react": "4.3.4",
     "typescript": "5.6.3",
     "vite": "5.4.21",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.28.0"
   },
   "devDependencies": {
     "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1"
+    "@types/react-dom": "18.3.1",
+    "@storybook/addon-essentials": "8.4.7",
+    "@storybook/react": "8.4.7",
+    "@storybook/react-vite": "8.4.7",
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/react": "16.0.1",
+    "jsdom": "25.0.1",
+    "storybook": "8.4.7",
+    "vitest": "1.6.1"
   }
 }
