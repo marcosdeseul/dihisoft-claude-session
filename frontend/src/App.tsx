@@ -1,18 +1,22 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-
-function HomePlaceholder() {
-  return <h1>React OK</h1>;
-}
+import PostListPage from './pages/PostListPage';
+import PostDetailPage from './pages/PostDetailPage';
+import PostNewPage from './pages/PostNewPage';
+import PostEditPage from './pages/PostEditPage';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<PostListPage />} />
+        <Route path="/posts/new" element={<PostNewPage />} />
+        <Route path="/posts/:id" element={<PostDetailPage />} />
+        <Route path="/posts/:id/edit" element={<PostEditPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="*" element={<HomePlaceholder />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
