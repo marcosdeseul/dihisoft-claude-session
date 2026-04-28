@@ -20,30 +20,6 @@ public class AuthViewController {
     this.authService = authService;
   }
 
-  @GetMapping("/signup")
-  public String signupForm(Model model) {
-    if (!model.containsAttribute("signupRequest")) {
-      model.addAttribute("signupRequest", new SignupRequest());
-    }
-    return "signup";
-  }
-
-  @PostMapping("/signup")
-  public String signupSubmit(
-      @Valid @ModelAttribute("signupRequest") SignupRequest signupRequest,
-      BindingResult bindingResult) {
-    if (bindingResult.hasErrors()) {
-      return "signup";
-    }
-    try {
-      authService.signup(signupRequest);
-    } catch (IllegalArgumentException ex) {
-      bindingResult.reject("signup.duplicate", ex.getMessage());
-      return "signup";
-    }
-    return "redirect:/signup?success=true";
-  }
-
   @GetMapping("/login")
   public String loginForm(Model model) {
     if (!model.containsAttribute("loginRequest")) {

@@ -1,12 +1,8 @@
 package com.example.board.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -153,73 +149,6 @@ class SignupControllerTest {
                   .content("{\"username\":\"dup\",\"password\":\"pw99999\"}"))
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.message").value(containsString("이미")));
-    }
-  }
-
-  @Nested
-  class View {
-
-    @Test
-    void GET_signup은_회원가입_폼을_렌더한다() throws Exception {
-      mockMvc
-          .perform(get("/signup"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("<form")))
-          .andExpect(content().string(containsString("action=\"/signup\"")))
-          .andExpect(content().string(containsString("name=\"username\"")))
-          .andExpect(content().string(containsString("name=\"password\"")))
-          .andExpect(content().string(containsString("type=\"submit\"")));
-    }
-
-    @Test
-    void POST_signup_정상입력시_success_파라미터로_리다이렉트된다() throws Exception {
-      mockMvc
-          .perform(
-              post("/signup")
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                  .param("username", "charlie")
-                  .param("password", "pw12345"))
-          .andExpect(status().is3xxRedirection())
-          .andExpect(header().string("Location", "/signup?success=true"));
-    }
-
-    @Test
-    void GET_signup_success시_가입완료_메시지를_렌더한다() throws Exception {
-      mockMvc
-          .perform(get("/signup").param("success", "true"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("가입 완료")));
-    }
-
-    @Test
-    void POST_signup_중복_username이면_동일화면에_중복_오류가_렌더된다() throws Exception {
-      mockMvc
-          .perform(
-              post("/api/auth/signup")
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content("{\"username\":\"exists\",\"password\":\"pw12345\"}"))
-          .andExpect(status().isCreated());
-
-      mockMvc
-          .perform(
-              post("/signup")
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                  .param("username", "exists")
-                  .param("password", "pw99999"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("이미")));
-    }
-
-    @Test
-    void POST_signup_검증_실패시_동일화면에_오류_메시지가_렌더된다() throws Exception {
-      mockMvc
-          .perform(
-              post("/signup")
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                  .param("username", "")
-                  .param("password", "pw12345"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(anyOf(containsString("username"), containsString("필수"))));
     }
   }
 }

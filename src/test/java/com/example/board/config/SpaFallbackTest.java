@@ -79,10 +79,10 @@ class SpaFallbackTest {
   }
 
   @Test
-  void GET_signup_thymeleaf는_여전히_동작한다() throws Exception {
+  void GET_signup은_React_SPA로_forward된다() throws Exception {
     mockMvc
         .perform(get("/signup"))
         .andExpect(status().isOk())
-        .andExpect(result -> assertThat(result.getResponse().getForwardedUrl()).isNull());
+        .andExpect(forwardedUrl("/index.html"));
   }
 }
