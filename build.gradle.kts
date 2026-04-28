@@ -1,8 +1,10 @@
 plugins {
     java
     jacoco
+    checkstyle
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
+    id("com.diffplug.spotless") version "6.25.0"
 }
 
 group = "com.example"
@@ -69,4 +71,34 @@ tasks.jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat("1.22.0")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint()
+    }
+}
+
+checkstyle {
+    toolVersion = "10.17.0"
+    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+    configProperties = mapOf(
+        "suppressionFile" to rootProject.file("config/checkstyle/suppressions.xml").absolutePath,
+    )
+    isIgnoreFailures = false
+    maxWarnings = 0
+}
+
+tasks.register("lint") {
+    group = "verification"
+    description = "Run all static checks (spotlessCheck + checkstyle)."
+    dependsOn("spotlessCheck", "checkstyleMain", "checkstyleTest")
 }

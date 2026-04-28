@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Tests: relax magic-number / utility-class-ctor rules -->
+    <suppress files="[\\/]src[\\/]test[\\/]" checks="MagicNumber"/>
+    <suppress files="[\\/]src[\\/]test[\\/]" checks="HideUtilityClassConstructor"/>
+
+    <!-- Generated sources (MapStruct, Querydsl, build output) -->
+    <suppress files="[\\/]build[\\/]generated[\\/]" checks=".*"/>
+    <suppress files="[\\/]generated[\\/]" checks=".*"/>
+</suppressions>
