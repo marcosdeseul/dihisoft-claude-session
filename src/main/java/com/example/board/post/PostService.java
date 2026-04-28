@@ -36,6 +36,8 @@ public class PostService {
   }
 
   public Post create(String title, String content, String username) {
+    requireText(title, "title");
+    requireText(content, "content");
     User author =
         userRepository
             .findByUsername(username)
@@ -47,10 +49,18 @@ public class PostService {
   }
 
   public Post update(Long id, String title, String content, String username) {
+    requireText(title, "title");
+    requireText(content, "content");
     Post post = get(id);
     assertOwnedBy(post, username);
     post.update(title, content);
     return post;
+  }
+
+  private void requireText(String value, String field) {
+    if (value == null || value.trim().isEmpty()) {
+      throw new IllegalArgumentException(field + "은 필수입니다");
+    }
   }
 
   public void delete(Long id, String username) {

@@ -20,6 +20,20 @@ spring:
   web:
     resources:
       add-mappings: false
+  ai:
+    mcp:
+      server:
+        name: board-mcp
+        version: 0.1.0
+        protocol: STATELESS
+        type: SYNC
+        instructions: "Board MCP server: 게시글 CRUD via X-API-Key (Stateless Streamable HTTP)"
+        stateless:
+          mcp-endpoint: /mcp
+        capabilities:
+          tool: true
+        annotation-scanner:
+          enabled: true
 
 app:
   jwt:
