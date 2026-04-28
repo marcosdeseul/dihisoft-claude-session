@@ -1,5 +1,6 @@
 package com.example.board.config;
 
+import com.example.board.security.ApiKeyAuthenticationFilter;
 import com.example.board.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +23,17 @@ public class SecurityConfig {
   private final RestAuthenticationEntryPoint authenticationEntryPoint;
   private final RestAccessDeniedHandler accessDeniedHandler;
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
   public SecurityConfig(
       RestAuthenticationEntryPoint authenticationEntryPoint,
       RestAccessDeniedHandler accessDeniedHandler,
-      JwtAuthenticationFilter jwtAuthenticationFilter) {
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) {
     this.authenticationEntryPoint = authenticationEntryPoint;
     this.accessDeniedHandler = accessDeniedHandler;
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
   }
 
   @Bean
@@ -77,7 +81,8 @@ public class SecurityConfig {
             ex ->
                 ex.authenticationEntryPoint(authenticationEntryPoint)
                     .accessDeniedHandler(accessDeniedHandler))
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterAfter(apiKeyAuthenticationFilter, JwtAuthenticationFilter.class);
     return http.build();
   }
 }
