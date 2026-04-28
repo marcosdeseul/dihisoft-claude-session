@@ -193,6 +193,15 @@ class ApiKeyServiceTest {
               e ->
                   assertThat(((ResponseStatusException) e).getStatusCode().value()).isEqualTo(404));
     }
+
+    @Test
+    void 존재하지_않는_username으로_폐기_시도하면_404() {
+      assertThatThrownBy(() -> apiKeyService.revoke("ghost", 1L))
+          .isInstanceOf(ResponseStatusException.class)
+          .satisfies(
+              e ->
+                  assertThat(((ResponseStatusException) e).getStatusCode().value()).isEqualTo(404));
+    }
   }
 
   @Nested

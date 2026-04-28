@@ -59,6 +59,19 @@ class ApiKeyAuthenticationFilterTest {
   }
 
   @Test
+  void X_API_Key_헤더가_빈_문자열이면_통과되고_SecurityContext는_비어있다() throws Exception {
+    MockHttpServletRequest req = new MockHttpServletRequest();
+    req.addHeader("X-API-Key", "");
+    MockHttpServletResponse res = new MockHttpServletResponse();
+    MockFilterChain chain = new MockFilterChain();
+
+    filter.doFilter(req, res, chain);
+
+    assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    assertThat(chain.getRequest()).isSameAs(req);
+  }
+
+  @Test
   void X_API_Key가_정상이면_SecurityContext에_키_소유자_username이_세팅된다() throws Exception {
     String plain = apiKeyService.issue("alice", "k").plainKey();
     MockHttpServletRequest req = new MockHttpServletRequest();
