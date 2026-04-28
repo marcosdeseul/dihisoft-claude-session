@@ -2,14 +2,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import PostListPage from './PostListPage';
+import * as tokenStore from '../auth/tokenStore';
 
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  tokenStore.clear();
 });
 
 beforeEach(() => {
   delete (globalThis as { fetch?: typeof fetch }).fetch;
+  tokenStore.clear();
 });
 
 interface MockResponse {
@@ -121,6 +124,7 @@ describe('PostListPage', () => {
   });
 
   it('글쓰기_버튼은_/posts/new_링크다', async () => {
+    tokenStore.set('jwt-token');
     mockFetchSequence([{ status: 200, body: listBody() }]);
     await act(async () => {
       renderListPage();
@@ -131,6 +135,44 @@ describe('PostListPage', () => {
       fireEvent.click(link);
     });
     expect(currentPath).toBe('/posts/new');
+  });
+
+  it('비로그인_시_글쓰기_버튼은_미렌더이고_로그인_가입_링크가_보인다', async () => {
+    mockFetchSequence([{ status: 200, body: listBody() }]);
+    await act(async () => {
+      renderListPage();
+    });
+    await flush();
+    expect(screen.queryByRole('link', { name: /글쓰기/ })).toBeNull();
+    expect(screen.getByRole('link', { name: /^로그인$/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /^가입$/ })).toBeTruthy();
+  });
+
+  it('로그인_시_API키_링크와_로그아웃_버튼이_보인다', async () => {
+    tokenStore.set('jwt-token');
+    mockFetchSequence([{ status: 200, body: listBody() }]);
+    await act(async () => {
+      renderListPage();
+    });
+    await flush();
+    expect(screen.getByRole('link', { name: /API 키/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /로그아웃/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /글쓰기/ })).toBeTruthy();
+  });
+
+  it('로그아웃_클릭_시_tokenStore가_clear되고_로그인_링크로_바뀐다', async () => {
+    tokenStore.set('jwt-token');
+    mockFetchSequence([{ status: 200, body: listBody() }]);
+    await act(async () => {
+      renderListPage();
+    });
+    await flush();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /로그아웃/ }));
+    });
+    expect(tokenStore.get()).toBeNull();
+    expect(screen.queryByRole('button', { name: /로그아웃/ })).toBeNull();
+    expect(screen.getByRole('link', { name: /^로그인$/ })).toBeTruthy();
   });
 
   it('다음_페이지_버튼_클릭_시_page1_을_요청한다', async () => {

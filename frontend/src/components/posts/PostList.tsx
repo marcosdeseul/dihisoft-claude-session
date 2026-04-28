@@ -8,9 +8,11 @@ export interface PostListProps {
   error?: string | null;
   page: number;
   totalPages: number;
+  authed: boolean;
   onPrev: () => void;
   onNext: () => void;
   onRetry?: () => void;
+  onLogout: () => void;
 }
 
 function formatDate(iso: string): string {
@@ -18,7 +20,8 @@ function formatDate(iso: string): string {
 }
 
 export function PostList(props: PostListProps) {
-  const { posts, loading, error, page, totalPages, onPrev, onNext, onRetry } = props;
+  const { posts, loading, error, page, totalPages, authed, onPrev, onNext, onRetry, onLogout } =
+    props;
   const hasPrev = page > 0;
   const hasNext = page < Math.max(totalPages - 1, 0);
   return (
@@ -31,8 +34,24 @@ export function PostList(props: PostListProps) {
           <div className="post-pagination-info">
             {totalPages > 0 ? `${page + 1} / ${totalPages}` : ' '}
           </div>
-          <div className="post-toolbar-right">
-            <Link to="/posts/new" className="post-btn">글쓰기</Link>
+          <div
+            className="post-toolbar-right"
+            style={{ display: 'flex', gap: 8, alignItems: 'center' }}
+          >
+            {authed ? (
+              <>
+                <Link to="/settings/api-keys" className="post-btn is-ghost">API 키</Link>
+                <button type="button" className="post-btn is-ghost" onClick={onLogout}>
+                  로그아웃
+                </button>
+                <Link to="/posts/new" className="post-btn">글쓰기</Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="post-btn is-ghost">로그인</Link>
+                <Link to="/signup" className="post-btn">가입</Link>
+              </>
+            )}
           </div>
         </div>
         {error && (
