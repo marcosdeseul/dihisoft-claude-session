@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @EntityGraph(attributePaths = "author")
-    Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+  @EntityGraph(attributePaths = "author")
+  Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    @Override
-    @EntityGraph(attributePaths = "author")
-    Optional<Post> findById(Long id);
+  @Override
+  @EntityGraph(attributePaths = "author")
+  Optional<Post> findById(Long id);
 }

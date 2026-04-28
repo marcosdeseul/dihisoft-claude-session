@@ -45,3 +45,10 @@ bin/
 
 # Playwright MCP / manual-test skill artifacts
 .playwright-mcp/
+
+# Agent handoff scratch (plan files for other agents, etc.)
+temp/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/

@@ -18,36 +18,33 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class CustomUserDetailsServiceTest {
 
-    @Autowired
-    CustomUserDetailsService customUserDetailsService;
+  @Autowired CustomUserDetailsService customUserDetailsService;
 
-    @Autowired
-    UserRepository userRepository;
+  @Autowired UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+  @Autowired PasswordEncoder passwordEncoder;
 
-    @BeforeEach
-    void cleanDb() {
-        userRepository.deleteAll();
-    }
+  @BeforeEach
+  void cleanDb() {
+    userRepository.deleteAll();
+  }
 
-    @Test
-    void loadUserByUsername_존재하는_사용자면_저장된_username과_해시된_password를_담은_UserDetails를_반환한다() {
-        String hashed = passwordEncoder.encode("pw12345");
-        userRepository.save(new User("uds_alice", hashed));
+  @Test
+  void loadUserByUsername_존재하는_사용자면_저장된_username과_해시된_password를_담은_UserDetails를_반환한다() {
+    String hashed = passwordEncoder.encode("pw12345");
+    userRepository.save(new User("uds_alice", hashed));
 
-        UserDetails details = customUserDetailsService.loadUserByUsername("uds_alice");
+    UserDetails details = customUserDetailsService.loadUserByUsername("uds_alice");
 
-        assertThat(details.getUsername()).isEqualTo("uds_alice");
-        assertThat(details.getPassword()).isEqualTo(hashed);
-        assertThat(details.getAuthorities()).isEmpty();
-    }
+    assertThat(details.getUsername()).isEqualTo("uds_alice");
+    assertThat(details.getPassword()).isEqualTo(hashed);
+    assertThat(details.getAuthorities()).isEmpty();
+  }
 
-    @Test
-    void loadUserByUsername_미존재_username이면_UsernameNotFoundException이_발생한다() {
-        assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername("uds_nobody"))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessageContaining("uds_nobody");
-    }
+  @Test
+  void loadUserByUsername_미존재_username이면_UsernameNotFoundException이_발생한다() {
+    assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername("uds_nobody"))
+        .isInstanceOf(UsernameNotFoundException.class)
+        .hasMessageContaining("uds_nobody");
+  }
 }

@@ -2,6 +2,7 @@ plugins {
     java
     jacoco
     checkstyle
+    id("com.github.node-gradle.node") version "7.1.0"
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
@@ -18,6 +19,12 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+node {
+    version.set("20.11.1")
+    download.set(true)
+    nodeProjectDir.set(file("frontend"))
 }
 
 dependencies {
@@ -73,6 +80,38 @@ tasks.jacocoTestCoverageVerification {
     }
 }
 
+val buildFrontend by tasks.registering(com.github.gradle.node.npm.task.NpmTask::class) {
+    dependsOn(tasks.npmInstall)
+    args.set(listOf("run", "build"))
+    inputs.dir("frontend/src")
+    inputs.file("frontend/package.json")
+    inputs.file("frontend/vite.config.ts")
+    inputs.file("frontend/tsconfig.json")
+    inputs.file("frontend/index.html")
+    outputs.dir("frontend/dist")
+}
+
+tasks.processResources {
+    dependsOn(buildFrontend)
+    from("frontend/dist") {
+        into("static")
+    }
+}
+
+val verifyFrontendBundle by tasks.registering {
+    dependsOn(tasks.processResources)
+    doLast {
+        val indexHtml = layout.buildDirectory.file("resources/main/static/index.html").get().asFile
+        require(indexHtml.exists()) {
+            "Frontend bundle missing: ${indexHtml.absolutePath}"
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(verifyFrontendBundle)
+}
+
 spotless {
     java {
         target("src/**/*.java")
@@ -90,9 +129,10 @@ spotless {
 checkstyle {
     toolVersion = "10.17.0"
     configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-    configProperties = mapOf(
-        "suppressionFile" to rootProject.file("config/checkstyle/suppressions.xml").absolutePath,
-    )
+    configProperties =
+        mapOf(
+            "suppressionFile" to rootProject.file("config/checkstyle/suppressions.xml").absolutePath,
+        )
     isIgnoreFailures = false
     maxWarnings = 0
 }

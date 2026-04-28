@@ -12,34 +12,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/__probe")
+@RequestMapping("/api/__probe")
 @Profile("test")
 class ExceptionProbeController {
 
-    @PostMapping("/validation")
-    void validation(@Valid @RequestBody ProbeRequest request) {
-    }
+  @PostMapping("/validation")
+  void validation(@Valid @RequestBody ProbeRequest request) {}
 
-    @GetMapping("/runtime")
-    String runtime() {
-        throw new RuntimeException("boom-do-not-leak");
-    }
+  @GetMapping("/runtime")
+  String runtime() {
+    throw new RuntimeException("boom-do-not-leak");
+  }
 
-    @GetMapping("/access-denied")
-    String accessDenied() {
-        throw new AccessDeniedException("nope");
-    }
+  @GetMapping("/access-denied")
+  String accessDenied() {
+    throw new AccessDeniedException("nope");
+  }
 
-    @GetMapping("/illegal")
-    String illegal() {
-        throw new IllegalArgumentException("bad argument");
-    }
+  @GetMapping("/illegal")
+  String illegal() {
+    throw new IllegalArgumentException("bad argument");
+  }
 
-    @GetMapping("/secured")
-    String secured() {
-        return "ok";
-    }
+  @GetMapping("/secured")
+  String secured() {
+    return "ok";
+  }
 
-    record ProbeRequest(@NotBlank String name, @Min(1) int age) {
-    }
+  record ProbeRequest(@NotBlank String name, @Min(1) int age) {}
 }

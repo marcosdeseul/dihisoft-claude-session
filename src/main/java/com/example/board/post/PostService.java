@@ -14,49 +14,54 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 public class PostService {
 
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
+  private final PostRepository postRepository;
+  private final UserRepository userRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-    }
+  public PostService(PostRepository postRepository, UserRepository userRepository) {
+    this.postRepository = postRepository;
+    this.userRepository = userRepository;
+  }
 
-    @Transactional(readOnly = true)
-    public Page<Post> list(Pageable pageable) {
-        return postRepository.findAllByOrderByCreatedAtDesc(pageable);
-    }
+  @Transactional(readOnly = true)
+  public Page<Post> list(Pageable pageable) {
+    return postRepository.findAllByOrderByCreatedAtDesc(pageable);
+  }
 
-    @Transactional(readOnly = true)
-    public Post get(Long id) {
-        return postRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다: " + id));
-    }
+  @Transactional(readOnly = true)
+  public Post get(Long id) {
+    return postRepository
+        .findById(id)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다: " + id));
+  }
 
-    public Post create(String title, String content, String username) {
-        User author = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(
+  public Post create(String title, String content, String username) {
+    User author =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다: " + username));
-        return postRepository.save(new Post(title, content, author));
-    }
+    return postRepository.save(new Post(title, content, author));
+  }
 
-    public Post update(Long id, String title, String content, String username) {
-        Post post = get(id);
-        assertOwnedBy(post, username);
-        post.update(title, content);
-        return post;
-    }
+  public Post update(Long id, String title, String content, String username) {
+    Post post = get(id);
+    assertOwnedBy(post, username);
+    post.update(title, content);
+    return post;
+  }
 
-    public void delete(Long id, String username) {
-        Post post = get(id);
-        assertOwnedBy(post, username);
-        postRepository.delete(post);
-    }
+  public void delete(Long id, String username) {
+    Post post = get(id);
+    assertOwnedBy(post, username);
+    postRepository.delete(post);
+  }
 
-    private void assertOwnedBy(Post post, String username) {
-        if (!post.isOwnedBy(username)) {
-            throw new AccessDeniedException("본인의 글만 수정/삭제할 수 있습니다");
-        }
+  private void assertOwnedBy(Post post, String username) {
+    if (!post.isOwnedBy(username)) {
+      throw new AccessDeniedException("본인의 글만 수정/삭제할 수 있습니다");
     }
+  }
 }

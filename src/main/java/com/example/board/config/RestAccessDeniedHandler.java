@@ -14,22 +14,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-    public RestAccessDeniedHandler(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+  public RestAccessDeniedHandler(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 
-    @Override
-    public void handle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            AccessDeniedException accessDeniedException) throws IOException {
-        response.setStatus(HttpStatus.FORBIDDEN.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        ErrorResponse body = ErrorResponse.of(
-                HttpStatus.FORBIDDEN, "접근이 거부되었습니다", request.getRequestURI());
-        objectMapper.writeValue(response.getWriter(), body);
-    }
+  @Override
+  public void handle(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      AccessDeniedException accessDeniedException)
+      throws IOException {
+    response.setStatus(HttpStatus.FORBIDDEN.value());
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding("UTF-8");
+    ErrorResponse body =
+        ErrorResponse.of(HttpStatus.FORBIDDEN, "접근이 거부되었습니다", request.getRequestURI());
+    objectMapper.writeValue(response.getWriter(), body);
+  }
 }
