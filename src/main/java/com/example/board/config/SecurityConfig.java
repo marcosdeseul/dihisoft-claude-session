@@ -64,8 +64,13 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/", "/index.html", "/assets/**")
                     .permitAll()
                     .requestMatchers(
+                        AntPathRequestMatcher.antMatcher("/mcp"),
+                        AntPathRequestMatcher.antMatcher("/mcp/**"))
+                    .authenticated()
+                    .requestMatchers(
                         new RegexRequestMatcher(
-                            "^(?!/api(?:/|$))(?!/h2-console(?:/|$))[^.]*$", HttpMethod.GET.name()))
+                            "^(?!/api(?:/|$))(?!/h2-console(?:/|$))(?!/mcp(?:/|$))[^.]*$",
+                            HttpMethod.GET.name()))
                     .permitAll()
                     .anyRequest()
                     .authenticated())
