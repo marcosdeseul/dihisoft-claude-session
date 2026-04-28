@@ -2,7 +2,9 @@ package com.example.board.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -149,6 +151,29 @@ class SignupControllerTest {
                   .content("{\"username\":\"dup\",\"password\":\"pw99999\"}"))
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.message").value(containsString("이미")));
+    }
+  }
+
+  @Nested
+  class Spa {
+
+    @Test
+    void GET_signup은_React_SPA_index_html로_forward된다() throws Exception {
+      mockMvc
+          .perform(get("/signup"))
+          .andExpect(status().isOk())
+          .andExpect(forwardedUrl("/index.html"));
+    }
+
+    @Test
+    void POST_signup_form_encoded는_form_핸들러가_없어_4xx를_반환한다() throws Exception {
+      mockMvc
+          .perform(
+              post("/signup")
+                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                  .param("username", "alice")
+                  .param("password", "pw12345"))
+          .andExpect(status().is4xxClientError());
     }
   }
 }
