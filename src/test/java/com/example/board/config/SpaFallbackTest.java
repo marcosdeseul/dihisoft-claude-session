@@ -85,4 +85,12 @@ class SpaFallbackTest {
         .andExpect(status().isOk())
         .andExpect(forwardedUrl("/index.html"));
   }
+
+  @Test
+  void GET_login은_React_SPA로_forward된다() throws Exception {
+    mockMvc
+        .perform(get("/login"))
+        .andExpect(status().isOk())
+        .andExpect(forwardedUrl("/index.html"));
+  }
 }

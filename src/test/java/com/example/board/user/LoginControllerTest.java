@@ -3,9 +3,6 @@ package com.example.board.user;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -244,81 +241,6 @@ class LoginControllerTest {
       mockMvc
           .perform(get("/api/probe/me").header("Authorization", "Bearer " + foreignToken))
           .andExpect(status().isUnauthorized());
-    }
-  }
-
-  @Nested
-  class View {
-
-    @Test
-    void GET_login은_로그인폼을_렌더한다() throws Exception {
-      mockMvc
-          .perform(get("/login"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("<form")))
-          .andExpect(content().string(containsString("action=\"/login\"")))
-          .andExpect(content().string(containsString("name=\"username\"")))
-          .andExpect(content().string(containsString("name=\"password\"")))
-          .andExpect(content().string(containsString("type=\"submit\"")));
-    }
-
-    @Test
-    void POST_login_정상입력시_302_redirect와_HttpOnly_accessToken_쿠키가_세팅된다() throws Exception {
-      mockMvc
-          .perform(
-              post("/login")
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                  .param("username", "alice")
-                  .param("password", "pw12345"))
-          .andExpect(status().is3xxRedirection())
-          .andExpect(header().string("Location", "/login?success=true"))
-          .andExpect(cookie().exists("accessToken"))
-          .andExpect(cookie().httpOnly("accessToken", true));
-    }
-
-    @Test
-    void POST_login_잘못된_password면_동일화면에_오류메시지가_렌더된다() throws Exception {
-      mockMvc
-          .perform(
-              post("/login")
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                  .param("username", "alice")
-                  .param("password", "wrong-password"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("<form")))
-          .andExpect(content().string(containsString("일치")));
-    }
-
-    @Test
-    void POST_login_존재하지_않는_username이면_동일화면에_오류메시지가_렌더된다() throws Exception {
-      mockMvc
-          .perform(
-              post("/login")
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                  .param("username", "nobody")
-                  .param("password", "pw12345"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("<form")));
-    }
-
-    @Test
-    void POST_login_username_빈문자열이면_동일화면에_검증_오류가_렌더된다() throws Exception {
-      mockMvc
-          .perform(
-              post("/login")
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                  .param("username", "")
-                  .param("password", "pw12345"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("username")));
-    }
-
-    @Test
-    void GET_login_success_파라미터시_성공메시지를_렌더한다() throws Exception {
-      mockMvc
-          .perform(get("/login").param("success", "true"))
-          .andExpect(status().isOk())
-          .andExpect(content().string(containsString("로그인 성공")));
     }
   }
 }

@@ -1,21 +1,20 @@
 import { FormEvent } from 'react';
-import { authEditorialCss } from '../auth/authStyles';
+import { authEditorialCss } from './authStyles';
 
-export type SignupField = 'username' | 'password';
+export type LoginField = 'username' | 'password';
 
-export interface SignupFormProps {
+export interface LoginFormProps {
   username: string;
   password: string;
-  onChange: (field: SignupField, value: string) => void;
+  onChange: (field: LoginField, value: string) => void;
   onSubmit: () => void;
   submitting?: boolean;
   error?: string | null;
-  success?: string | null;
-  fieldErrors?: Partial<Record<SignupField, string>>;
+  fieldErrors?: Partial<Record<LoginField, string>>;
 }
 
-export function SignupForm(props: SignupFormProps) {
-  const { username, password, onChange, onSubmit, submitting, error, success, fieldErrors } = props;
+export function LoginForm(props: LoginFormProps) {
+  const { username, password, onChange, onSubmit, submitting, error, fieldErrors } = props;
   const userErr = fieldErrors?.username;
   const pwErr = fieldErrors?.password;
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -26,10 +25,9 @@ export function SignupForm(props: SignupFormProps) {
     <div className="auth-edit-page">
       <style>{authEditorialCss}</style>
       <div className="auth-edit-card">
-        <p className="auth-edit-eyebrow">Board · Sign up</p>
-        <h1 className="auth-edit-h1">회원가입</h1>
-        <p className="auth-edit-sub">계정을 만들어 글을 쓰고 토론에 참여하세요.</p>
-        {success && <div className="auth-edit-success" role="status">{success}</div>}
+        <p className="auth-edit-eyebrow">Board · Sign in</p>
+        <h1 className="auth-edit-h1">로그인</h1>
+        <p className="auth-edit-sub">다시 만나서 반가워요. 계정 정보를 입력해주세요.</p>
         {error && <div className="auth-edit-alert" role="alert">{error}</div>}
         <form onSubmit={handleSubmit} noValidate>
           <div className="auth-edit-field">
@@ -55,7 +53,7 @@ export function SignupForm(props: SignupFormProps) {
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="new-password"
+                autoComplete="current-password"
                 className={`auth-edit-input${pwErr ? ' is-error' : ''}`}
                 value={password}
                 onChange={(e) => onChange('password', e.target.value)}
@@ -65,11 +63,11 @@ export function SignupForm(props: SignupFormProps) {
             {pwErr && <div className="auth-edit-fielderr">{pwErr}</div>}
           </div>
           <button type="submit" className="auth-edit-cta" disabled={submitting}>
-            {submitting ? '가입 중…' : '계정 만들기'}
+            {submitting ? '로그인 중…' : '로그인'}
           </button>
         </form>
         <div className="auth-edit-foot">
-          이미 계정이 있나요? <a href="/login">로그인 →</a>
+          계정이 없나요? <a href="/signup">회원가입 →</a>
         </div>
       </div>
     </div>
