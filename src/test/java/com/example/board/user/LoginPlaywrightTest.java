@@ -43,8 +43,7 @@ class LoginPlaywrightTest {
         page.click("button[type=submit]");
 
         page.waitForSelector(
-            "text=게시판",
-            new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            "text=게시판", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
 
         assertThat(page.url()).doesNotContain("/login");
       } finally {

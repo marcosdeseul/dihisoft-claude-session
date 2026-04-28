@@ -50,8 +50,7 @@ class PostBoardPlaywrightTest {
 
         // 2) 목록 진입 — "게시판" 헤딩 가시
         page.waitForSelector(
-            "text=게시판",
-            new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            "text=게시판", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         assertThat(page.url()).doesNotContain("/login");
 
         // 3) 글쓰기
@@ -82,8 +81,7 @@ class PostBoardPlaywrightTest {
         page.onceDialog(dialog -> dialog.accept());
         page.click("text=삭제");
         page.waitForSelector(
-            "text=게시판",
-            new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
+            "text=게시판", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE));
         assertThat(page.url()).endsWith("/");
         assertThat(page.content()).doesNotContain(edited);
       } finally {
