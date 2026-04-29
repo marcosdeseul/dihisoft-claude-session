@@ -58,3 +58,6 @@ frontend/dist/
 
 # Project root .mcp.json (plaintext API key)
 .mcp.json
+
+# Claude Code internal lock (per-session, never commit)
+.claude/scheduled_tasks.lock
