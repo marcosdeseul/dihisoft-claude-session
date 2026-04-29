@@ -55,3 +55,6 @@ frontend/dist/
 
 # Local MCP server config (contains plaintext API keys)
 .claude/.mcp.json
+
+# Project root .mcp.json (plaintext API key)
+.mcp.json

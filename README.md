@@ -274,6 +274,85 @@ curl localhost:8080/api/posts
 
 ---
 
+## 10. MCP 서버 사용법 (Claude Code · Cursor 등 LLM 클라이언트 연동)
+
+이 프로젝트는 게시글 CRUD를 **MCP(Model Context Protocol) 도구**로도 노출한다. LLM 클라이언트가 `X-API-Key` 헤더로 인증하면 본인 명의로 게시글을 작성·수정·삭제할 수 있다.
+
+- **트랜스포트**: Stateless Streamable HTTP (단일 endpoint `POST /mcp`)
+- **노출 도구 (5)**: `posts_list / posts_get / posts_create / posts_update / posts_delete`
+- **인증**: 사용자별 API key (`X-API-Key` 헤더). 브라우저 세션 없이 사용 가능
+
+### 10.1 키 발급
+
+1. 서버 기동
+   ```bash
+   ./gradlew bootRun
+   ```
+2. 브라우저에서 `http://localhost:8080/signup` → 가입 → `/login` → 로그인
+3. 우상단 **`API 키`** 메뉴 → `/settings/api-keys` 진입
+4. label 입력 후 **`발급`** → **평문 키(`bk_…` 35자)는 1회만 노출됨** → 즉시 복사
+
+> 새로고침하거나 페이지를 떠나면 평문은 영구 소실된다. 잃어버리면 폐기 후 재발급.
+
+### 10.2 `.mcp.json` 작성
+
+저장소 루트에 [.mcp.sample.json](.mcp.sample.json)을 복사하고 키만 채운다:
+
+```bash
+cp .mcp.sample.json .mcp.json
+# .mcp.json 의 X-API-Key 값을 발급받은 평문 키로 교체
+```
+
+`.mcp.json` 형식 ([Claude Code 표준](https://code.claude.com/docs/en/mcp)):
+
+```json
+{
+  "mcpServers": {
+    "board": {
+      "type": "http",
+      "url": "http://localhost:8080/mcp",
+      "headers": {
+        "X-API-Key": "bk_…",
+        "Accept": "application/json, text/event-stream"
+      }
+    }
+  }
+}
+```
+
+> ⚠️ `.mcp.json`은 평문 API key를 포함하므로 `.gitignore` 처리되어 있다 — 절대 커밋 금지. `.mcp.sample.json`만 버전 관리한다.
+
+### 10.3 Claude Code 인식
+
+1. Claude Code를 **새 세션**으로 시작 (저장소 루트 디렉터리)
+2. 첫 진입 시 *project-scoped `.mcp.json` 신뢰 prompt*가 뜬다 → **승인**
+3. `/mcp` 명령으로 다이얼로그 열어 `board` 서버 ✓ Connected 확인
+4. 새 세션에서 `posts_list` 등 도구 호출 가능
+
+신뢰 prompt가 다시 안 뜨면:
+```bash
+claude mcp reset-project-choices    # 승인/거부 선택 reset
+```
+
+### 10.4 동작 확인 (curl)
+
+```bash
+KEY="bk_…"
+curl -X POST http://localhost:8080/mcp \
+  -H "X-API-Key: $KEY" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+응답에 `posts_list / posts_get / posts_create / posts_update / posts_delete` 5개 도구가 노출되면 정상이다.
+
+### 10.5 비범위
+- Claude Desktop / Cursor 등 다른 클라이언트의 설정 파일 위치는 각 도구 문서를 참고
+- TLS / 원격 호스팅 / OAuth2 / rate limit 은 후속 이슈
+
+---
+
 ## 라이선스
 
 MIT License — [LICENSE](LICENSE) 참고.
