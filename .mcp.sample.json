@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "board": {
+      "type": "http",
+      "url": "http://localhost:8080/mcp",
+      "headers": {
+        "X-API-Key": "bk_<paste-plaintext-key-issued-from-/settings/api-keys>",
+        "Accept": "application/json, text/event-stream"
+      }
+    }
+  }
+}

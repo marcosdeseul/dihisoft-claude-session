@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { listPosts, PostError, type PostPageResponse } from '../api/posts';
+import * as tokenStore from '../auth/tokenStore';
 import { PostList } from '../components/posts/PostList';
 
 const FALLBACK_ERROR = '게시글을 불러오지 못했습니다';
@@ -9,6 +10,7 @@ export default function PostListPage() {
   const [data, setData] = useState<PostPageResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [authed, setAuthed] = useState<boolean>(() => tokenStore.get() !== null);
 
   const load = useCallback((p: number) => {
     setLoading(true);
@@ -32,6 +34,10 @@ export default function PostListPage() {
   const onPrev = () => load(Math.max(0, page - 1));
   const onNext = () => load(page + 1);
   const onRetry = () => load(page);
+  const onLogout = () => {
+    tokenStore.clear();
+    setAuthed(false);
+  };
 
   return (
     <PostList
@@ -40,9 +46,11 @@ export default function PostListPage() {
       error={error}
       page={page}
       totalPages={data?.totalPages ?? 0}
+      authed={authed}
       onPrev={onPrev}
       onNext={onNext}
       onRetry={onRetry}
+      onLogout={onLogout}
     />
   );
 }
