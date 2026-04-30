@@ -44,7 +44,26 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.microsoft.playwright:playwright:1.45.0")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:3.0.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+val snippetsDir = layout.buildDirectory.dir("generated-snippets")
+val recordingsDir = layout.projectDirectory.dir("frontend/src/__fixtures__/recordings")
+
+val syncRecordings by tasks.registering(Sync::class) {
+    description = "Mirrors REST Docs JSON snippets into frontend/src/__fixtures__/recordings."
+    group = "verification"
+    from(snippetsDir) {
+        include("**/request-body.json")
+        include("**/response-body.json")
+        rename("request-body\\.json", "req.json")
+        rename("response-body\\.json", "res.json")
+    }
+    into(recordingsDir)
+    preserve {
+        include(".gitkeep")
+    }
 }
 
 tasks.withType<Test> {
@@ -53,7 +72,8 @@ tasks.withType<Test> {
             excludeTags("playwright")
         }
     }
-    finalizedBy(tasks.jacocoTestReport)
+    outputs.dir(snippetsDir)
+    finalizedBy(tasks.jacocoTestReport, syncRecordings)
 }
 
 jacoco {

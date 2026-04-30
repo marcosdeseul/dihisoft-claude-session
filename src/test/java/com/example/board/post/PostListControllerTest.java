@@ -4,12 +4,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.board.support.ApiDocs;
 import com.example.board.user.User;
 import com.example.board.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @ActiveProfiles("test")
 class PostListControllerTest {
 
@@ -159,6 +162,7 @@ class PostListControllerTest {
         .andExpect(jsonPath("$.content[0].content").value("world"))
         .andExpect(jsonPath("$.content[0].authorUsername").value("alice"))
         .andExpect(jsonPath("$.content[0].createdAt").exists())
-        .andExpect(jsonPath("$.content[0].updatedAt").exists());
+        .andExpect(jsonPath("$.content[0].updatedAt").exists())
+        .andDo(ApiDocs.snippet("posts-list-200"));
   }
 }
