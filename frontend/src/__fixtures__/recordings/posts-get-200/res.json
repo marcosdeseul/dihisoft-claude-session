@@ -1,0 +1,8 @@
+{
+  "id" : 1,
+  "title" : "hello",
+  "content" : "world",
+  "authorUsername" : "alice",
+  "createdAt" : "2026-04-30T08:32:15.728746Z",
+  "updatedAt" : "2026-04-30T08:32:15.728746Z"
+}

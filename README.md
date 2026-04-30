@@ -258,6 +258,25 @@ curl -X POST localhost:8080/api/posts \
 curl localhost:8080/api/posts
 ```
 
+### 응답 레코더 (Spring REST Docs → 프론트 fixture)
+
+`./gradlew test` 가 끝나면 happy-path MockMvc 테스트의 실제 request/response JSON 이 자동으로 두 곳에 저장된다.
+
+- 백엔드 산출물: `build/generated-snippets/<op-id>/{request-body,response-body}.json` (REST Docs)
+- 프론트 fixture (자동 동기화): `frontend/src/__fixtures__/recordings/<op-id>/{req,res}.json`
+
+`syncRecordings` Gradle task 가 `test` 의 finalizer 로 묶여 있어 별도 명령은 필요 없다. 추적 중인 `<op-id>` 는 다음과 같다.
+
+| op-id | HTTP | 설명 |
+|---|---|---|
+| `posts-get-200` | GET `/api/posts/{id}` | 단건 조회 |
+| `posts-list-200` | GET `/api/posts` | 목록 (1건 포함) |
+| `posts-create-201` | POST `/api/posts` | 작성 |
+| `posts-update-200` | PUT `/api/posts/{id}` | 수정 |
+| `posts-delete-204` | DELETE `/api/posts/{id}` | 삭제 |
+
+새 happy-path 를 추가할 때는 테스트에 `.andDo(ApiDocs.snippet("<op-id>"))` 한 줄을 추가하면 된다 (`com.example.board.support.ApiDocs`). recordings 디렉토리는 git 에 커밋하므로 응답 형식 변경은 PR diff 로 즉시 감지된다.
+
 ---
 
 ## 9. 로드맵
