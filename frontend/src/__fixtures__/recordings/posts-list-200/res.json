@@ -1,0 +1,14 @@
+{
+  "content" : [ {
+    "id" : 34,
+    "title" : "hello",
+    "content" : "world",
+    "authorUsername" : "alice",
+    "createdAt" : "2026-04-30T08:32:28.934263Z",
+    "updatedAt" : "2026-04-30T08:32:28.934263Z"
+  } ],
+  "page" : 0,
+  "size" : 10,
+  "totalElements" : 1,
+  "totalPages" : 1
+}
